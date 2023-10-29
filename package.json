@@ -1,43 +1,44 @@
 {
   "name": "vscode-oniguruma",
   "version": "0.0.1",
+  "private": "false",
   "description": "VSCode oniguruma bindings",
-  "author": {
-    "name": "Nikola Hristov",
-    "email": "nikola@nikolahristov.tech",
-    "url": "https://nikolahristov.tech"
+  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
+  "bugs": {
+    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
   },
-  "main": "release/main.js",
-  "typings": "main.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
   },
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
+  "author": {
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
   },
+  "publisher": "playform",
+  "type": "module",
+  "main": "release/main.js",
+  "typings": "main.d.ts",
   "scripts": {
-    "test": "mocha --ui=tdd ./out/test/index.test.js",
     "build-onig": "cd deps/oniguruma && autoreconf -vfi && emconfigure ./configure && make clean && emmake make",
-    "build-wasm": "./scripts/build.sh",
     "build-tsc": "tsc -p tsconfig.json",
-    "watch-tsc": "tsc -w -p tsconfig.json",
+    "build-wasm": "./scripts/build.sh",
     "package": "npm run build-tsc && webpack && node ./scripts/cp ./out/onig.wasm ./release/onig.wasm",
-    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts"
+    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts",
+    "test": "mocha --ui=tdd ./out/test/index.test.js",
+    "watch-tsc": "tsc -w -p tsconfig.json"
   },
   "devDependencies": {
     "@types/mocha": "10.0.3",
     "@types/node": "20.8.9",
     "mocha": "10.2.0",
     "typescript": "5.2.2",
+    "typescript-esbuild": "0.3.1",
     "webpack": "5.89.0",
-    "webpack-cli": "5.1.4",
-    "typescript-esbuild": "0.3.1"
+    "webpack-cli": "5.1.4"
   },
-  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
-  "type": "module",
-  "private": "false",
   "publishConfig": {
     "access": "public"
   }
