@@ -3,11 +3,7 @@
  *--------------------------------------------------------*/
 
 export interface WebAssemblyInstantiator {
-	(
-		importObject:
-			| Record<string, Record<string, WebAssembly.ImportValue>>
-			| undefined
-	): Promise<WebAssembly.WebAssemblyInstantiatedSource>;
+	(importObject: Record<string, Record<string, WebAssembly.ImportValue>> | undefined): Promise<WebAssembly.WebAssemblyInstantiatedSource>;
 }
 interface ICommonOptions {
 	print?(str: string): void;
@@ -21,9 +17,7 @@ interface IDataOptions extends ICommonOptions {
 export type IOptions = IInstantiatorOptions | IDataOptions;
 
 export function loadWASM(options: IOptions): Promise<void>;
-export function loadWASM(
-	data: ArrayBufferView | ArrayBuffer | Response
-): Promise<void>;
+export function loadWASM(data: ArrayBufferView | ArrayBuffer | Response): Promise<void>;
 export function createOnigString(str: string): OnigString;
 export function createOnigScanner(patterns: string[]): OnigScanner;
 export function setDefaultDebugCall(defaultDebugCall: boolean): void;
@@ -138,7 +132,7 @@ export const enum FindOption {
 	/**
 	 * used for debugging purposes.
 	 */
-	DebugCall,
+	DebugCall
 }
 
 export const enum Syntax {
@@ -154,40 +148,29 @@ export const enum Syntax {
 	PerlNg,
 	Ruby,
 	Python,
-	Oniguruma,
+	Oniguruma
 }
 
 export interface IOnigScannerConfig {
-	options?: FindOption[];
-	syntax?: Syntax;
+	options?: FindOption[],
+	syntax?: Syntax
 }
 
 export class OnigScanner {
 	constructor(patterns: string[], config?: IOnigScannerConfig);
 	public dispose(): void;
-	public findNextMatchSync(
-		string: string | OnigString,
-		startPosition: number,
-		options: FindOption[]
-	): IOnigMatch | null;
-	public findNextMatchSync(
-		string: string | OnigString,
-		startPosition: number,
-		debugCall: boolean
-	): IOnigMatch | null;
-	public findNextMatchSync(
-		string: string | OnigString,
-		startPosition: number
-	): IOnigMatch | null;
+	public findNextMatchSync(string: string | OnigString, startPosition: number, options: FindOption[]): IOnigMatch | null;
+	public findNextMatchSync(string: string | OnigString, startPosition: number, debugCall: boolean): IOnigMatch | null;
+	public findNextMatchSync(string: string | OnigString, startPosition: number): IOnigMatch | null;
 }
 
 export interface IOnigCaptureIndex {
-	start: number;
-	end: number;
-	length: number;
+	start: number
+	end: number
+	length: number
 }
 
 export interface IOnigMatch {
-	index: number;
-	captureIndices: IOnigCaptureIndex[];
+	index: number
+	captureIndices: IOnigCaptureIndex[]
 }
