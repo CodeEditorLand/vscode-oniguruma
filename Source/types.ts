@@ -13,30 +13,10 @@ export interface IOnigBinding {
 	UTF8ToString(ptr: Pointer): string;
 
 	_getLastOnigError(): Pointer;
-	_createOnigScanner(
-		strPtrsPtr: Pointer,
-		strLenPtr: Pointer,
-		count: number,
-		options: number,
-		syntax: Pointer
-	): Pointer;
+	_createOnigScanner(strPtrsPtr: Pointer, strLenPtr: Pointer, count: number, options: number, syntax: Pointer): Pointer;
 	_freeOnigScanner(ptr: Pointer): void;
-	_findNextOnigScannerMatch(
-		scanner: Pointer,
-		strCacheId: number,
-		strData: Pointer,
-		strLength: number,
-		position: number,
-		options: number
-	): number;
-	_findNextOnigScannerMatchDbg(
-		scanner: Pointer,
-		strCacheId: number,
-		strData: Pointer,
-		strLength: number,
-		position: number,
-		options: number
-	): number;
+	_findNextOnigScannerMatch(scanner: Pointer, strCacheId: number, strData: Pointer, strLength: number, position: number, options: number): number;
+	_findNextOnigScannerMatchDbg(scanner: Pointer, strCacheId: number, strData: Pointer, strLength: number, position: number, options: number): number;
 
 	ONIG_OPTION_DEFAULT: number;
 	ONIG_OPTION_NONE: number;
@@ -93,10 +73,7 @@ export interface IOnigMatch {
 }
 
 export interface OnigScanner {
-	findNextMatchSync(
-		string: string | OnigString,
-		startPosition: number
-	): IOnigMatch | null;
+	findNextMatchSync(string: string | OnigString, startPosition: number): IOnigMatch | null;
 	readonly dispose?: () => void;
 }
 
