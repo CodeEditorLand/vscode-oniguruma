@@ -1,35 +1,45 @@
 {
-	"name": "vscode-oniguruma",
-	"version": "2.0.1",
-	"description": "VSCode oniguruma bindings",
-	"bugs": {
-		"url": "https://github.com/microsoft/vscode-oniguruma/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/microsoft/vscode-oniguruma"
-	},
-	"license": "MIT",
-	"author": {
-		"name": "Microsoft Corporation"
-	},
-	"main": "release/main.js",
-	"typings": "main.d.ts",
-	"scripts": {
-		"build-onig": "cd deps/oniguruma && autoreconf -vfi && emconfigure ./configure && make clean && emmake make",
-		"build-tsc": "tsc -p tsconfig.json",
-		"build-wasm": "./scripts/build.sh",
-		"package": "npm run build-tsc && webpack && node ./scripts/cp ./out/onig.wasm ./release/onig.wasm",
-		"prepublishOnly": "npm run package",
-		"test": "mocha --ui=tdd ./out/test/index.test.js",
-		"watch-tsc": "tsc -w -p tsconfig.json"
-	},
-	"devDependencies": {
-		"@types/mocha": "10.0.4",
-		"@types/node": "20.9.2",
-		"mocha": "10.2.0",
-		"typescript": "5.2.2",
-		"webpack": "5.89.0",
-		"webpack-cli": "5.1.4"
-	}
+  "name": "vscode-oniguruma",
+  "version": "0.0.1",
+  "description": "VSCode oniguruma bindings",
+  "bugs": {
+    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
+  },
+  "main": "release/main.js",
+  "typings": "main.d.ts",
+  "scripts": {
+    "build-onig": "cd deps/oniguruma && autoreconf -vfi && emconfigure ./configure && make clean && emmake make",
+    "build-tsc": "tsc -p tsconfig.json",
+    "build-wasm": "./scripts/build.sh",
+    "package": "npm run build-tsc && webpack && node ./scripts/cp ./out/onig.wasm ./release/onig.wasm",
+    "prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+    "test": "mocha --ui=tdd ./out/test/index.test.js",
+    "watch-tsc": "tsc -w -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/mocha": "10.0.6",
+    "@types/node": "20.9.4",
+    "mocha": "10.2.0",
+    "typescript": "5.3.2",
+    "webpack": "5.89.0",
+    "webpack-cli": "5.1.4",
+    "typescript-esbuild": "0.3.1"
+  },
+  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
+  "type": "module",
+  "publisher": "playform",
+  "private": "false",
+  "publishConfig": {
+    "access": "public"
+  }
 }
