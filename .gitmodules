@@ -1,0 +1,3 @@
+[submodule "deps/Oniguruma"]
+	path = deps/Oniguruma
+	url = ssh://git@github.com/CodeEditorLand/Oniguruma.git
