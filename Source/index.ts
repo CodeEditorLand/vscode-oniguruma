@@ -293,6 +293,7 @@ export class OnigString implements IOnigString {
 		if (!onigBinding) {
 			throw new Error(`Must invoke loadWASM first.`);
 		}
+
 		this._onigBinding = onigBinding;
 		this.content = str;
 		const utfString = new UtfString(str);

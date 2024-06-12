@@ -52,7 +52,6 @@ extends:
           - name: Linux
             nodeVersions:
               - 18.x
-            useSysroot: false
 
         testSteps:
           - script: git submodule init
