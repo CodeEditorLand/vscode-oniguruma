@@ -11,6 +11,6 @@
 		"watch-tsc": "tsc -w -p tsconfig.json"
 	},
 	"devDependencies": {
-		"@types/node": "18.11.9"
+		"@types/node": "20.14.12"
 	}
 }
