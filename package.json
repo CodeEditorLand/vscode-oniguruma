@@ -1,8 +1,10 @@
 {
-	"name": "vscode-oniguruma",
 	"description": "VSCode oniguruma bindings",
+	"devDependencies": {
+		"@types/node": "22.4.0"
+	},
 	"main": "release/main.js",
-	"typings": "main.d.ts",
+	"name": "vscode-oniguruma",
 	"scripts": {
 		"build-onig": "cd deps/oniguruma && autoreconf -vfi && emconfigure ./configure && make clean && emmake make",
 		"build-tsc": "tsc -p tsconfig.json",
@@ -10,7 +12,5 @@
 		"prepublishOnly": "npm run package",
 		"watch-tsc": "tsc -w -p tsconfig.json"
 	},
-	"devDependencies": {
-		"@types/node": "22.4.0"
-	}
+	"typings": "main.d.ts"
 }
