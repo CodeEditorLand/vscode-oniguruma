@@ -2,8 +2,15 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { IOnigBinding, Pointer, IOnigMatch, IOnigCaptureIndex, OnigScanner as IOnigScanner, OnigString as IOnigString } from './types';
-import OnigasmModuleFactory from './onig';
+import {
+	IOnigBinding,
+	Pointer,
+	IOnigMatch,
+	IOnigCaptureIndex,
+	OnigScanner as IOnigScanner,
+	OnigString as IOnigString,
+} from "./types";
+import OnigasmModuleFactory from "./onig";
 
 export const enum FindOption {
 	/**
@@ -109,7 +116,7 @@ export const enum FindOption {
 	/**
 	 * used for debugging purposes.
 	 */
-	DebugCall
+	DebugCall,
 }
 
 export const enum Syntax {
@@ -125,7 +132,7 @@ export const enum Syntax {
 	PerlNg,
 	Ruby,
 	Python,
-	Oniguruma
+	Oniguruma,
 }
 
 let onigBinding: IOnigBinding | null = null;
@@ -136,7 +143,6 @@ function throwLastOnigError(onigBinding: IOnigBinding): void {
 }
 
 class UtfString {
-
 	private static _utf8ByteLength(str: string): number {
 		let result = 0;
 		for (let i = 0, len = str.length; i < len; i++) {
@@ -151,7 +157,9 @@ class UtfString {
 					const nextCharCode = str.charCodeAt(i + 1);
 					if (nextCharCode >= 0xdc00 && nextCharCode <= 0xdfff) {
 						// Found the matching low surrogate
-						codepoint = (((charCode - 0xd800) << 10) + 0x10000) | (nextCharCode - 0xdc00);
+						codepoint =
+							(((charCode - 0xd800) << 10) + 0x10000) |
+							(nextCharCode - 0xdc00);
 						wasSurrogatePair = true;
 					}
 				}
@@ -185,12 +193,16 @@ class UtfString {
 	constructor(str: string) {
 		const utf16Length = str.length;
 		const utf8Length = UtfString._utf8ByteLength(str);
-		const computeIndicesMapping = (utf8Length !== utf16Length);
-		const utf16OffsetToUtf8 = computeIndicesMapping ? new Uint32Array(utf16Length + 1) : null!;
+		const computeIndicesMapping = utf8Length !== utf16Length;
+		const utf16OffsetToUtf8 = computeIndicesMapping
+			? new Uint32Array(utf16Length + 1)
+			: null!;
 		if (computeIndicesMapping) {
 			utf16OffsetToUtf8[utf16Length] = utf8Length;
 		}
-		const utf8OffsetToUtf16 = computeIndicesMapping ? new Uint32Array(utf8Length + 1) : null!;
+		const utf8OffsetToUtf16 = computeIndicesMapping
+			? new Uint32Array(utf8Length + 1)
+			: null!;
 		if (computeIndicesMapping) {
 			utf8OffsetToUtf16[utf8Length] = utf16Length;
 		}
@@ -209,7 +221,9 @@ class UtfString {
 					const nextCharCode = str.charCodeAt(i16 + 1);
 					if (nextCharCode >= 0xdc00 && nextCharCode <= 0xdfff) {
 						// Found the matching low surrogate
-						codePoint = (((charCode - 0xd800) << 10) + 0x10000) | (nextCharCode - 0xdc00);
+						codePoint =
+							(((charCode - 0xd800) << 10) + 0x10000) |
+							(nextCharCode - 0xdc00);
 						wasSurrogatePair = true;
 					}
 				}
@@ -241,17 +255,35 @@ class UtfString {
 			if (codePoint <= 0x7f) {
 				utf8Value[i8++] = codePoint;
 			} else if (codePoint <= 0x7ff) {
-				utf8Value[i8++] = 0b11000000 | ((codePoint & 0b00000000000000000000011111000000) >>> 6);
-				utf8Value[i8++] = 0b10000000 | ((codePoint & 0b00000000000000000000000000111111) >>> 0);
+				utf8Value[i8++] =
+					0b11000000 |
+					((codePoint & 0b00000000000000000000011111000000) >>> 6);
+				utf8Value[i8++] =
+					0b10000000 |
+					((codePoint & 0b00000000000000000000000000111111) >>> 0);
 			} else if (codePoint <= 0xffff) {
-				utf8Value[i8++] = 0b11100000 | ((codePoint & 0b00000000000000001111000000000000) >>> 12);
-				utf8Value[i8++] = 0b10000000 | ((codePoint & 0b00000000000000000000111111000000) >>> 6);
-				utf8Value[i8++] = 0b10000000 | ((codePoint & 0b00000000000000000000000000111111) >>> 0);
+				utf8Value[i8++] =
+					0b11100000 |
+					((codePoint & 0b00000000000000001111000000000000) >>> 12);
+				utf8Value[i8++] =
+					0b10000000 |
+					((codePoint & 0b00000000000000000000111111000000) >>> 6);
+				utf8Value[i8++] =
+					0b10000000 |
+					((codePoint & 0b00000000000000000000000000111111) >>> 0);
 			} else {
-				utf8Value[i8++] = 0b11110000 | ((codePoint & 0b00000000000111000000000000000000) >>> 18);
-				utf8Value[i8++] = 0b10000000 | ((codePoint & 0b00000000000000111111000000000000) >>> 12);
-				utf8Value[i8++] = 0b10000000 | ((codePoint & 0b00000000000000000000111111000000) >>> 6);
-				utf8Value[i8++] = 0b10000000 | ((codePoint & 0b00000000000000000000000000111111) >>> 0);
+				utf8Value[i8++] =
+					0b11110000 |
+					((codePoint & 0b00000000000111000000000000000000) >>> 18);
+				utf8Value[i8++] =
+					0b10000000 |
+					((codePoint & 0b00000000000000111111000000000000) >>> 12);
+				utf8Value[i8++] =
+					0b10000000 |
+					((codePoint & 0b00000000000000000000111111000000) >>> 6);
+				utf8Value[i8++] =
+					0b10000000 |
+					((codePoint & 0b00000000000000000000000000111111) >>> 0);
 			}
 
 			if (wasSurrogatePair) {
@@ -275,12 +307,11 @@ class UtfString {
 }
 
 export class OnigString implements IOnigString {
-
 	private static LAST_ID = 0;
 	private static _sharedPtr: Pointer = 0; // a pointer to a string of 10000 bytes
 	private static _sharedPtrInUse: boolean = false;
 
-	public readonly id = (++OnigString.LAST_ID);
+	public readonly id = ++OnigString.LAST_ID;
 	private readonly _onigBinding: IOnigBinding;
 	public readonly content: string;
 	public readonly utf16Length: number;
@@ -349,12 +380,11 @@ export class OnigString implements IOnigString {
 }
 
 export interface IOnigScannerConfig {
-	options?: FindOption[],
-	syntax?: Syntax
+	options?: FindOption[];
+	syntax?: Syntax;
 }
 
 export class OnigScanner implements IOnigScanner {
-
 	private readonly _onigBinding: IOnigBinding;
 	private readonly _ptr: Pointer;
 	private readonly _options: FindOption[];
@@ -380,7 +410,13 @@ export class OnigScanner implements IOnigScanner {
 		this._options = config?.options ?? [FindOption.CaptureGroup];
 		const opts = this.onigOptions(this._options);
 		const syntax = this.onigSyntax(config?.syntax ?? Syntax.Default);
-		const scannerPtr = onigBinding._createOnigScanner(strPtrsPtr, strLenPtr, patterns.length, opts, syntax);
+		const scannerPtr = onigBinding._createOnigScanner(
+			strPtrsPtr,
+			strLenPtr,
+			patterns.length,
+			opts,
+			syntax,
+		);
 		this._ptr = scannerPtr;
 
 		for (let i = 0, len = patterns.length; i < len; i++) {
@@ -398,10 +434,25 @@ export class OnigScanner implements IOnigScanner {
 		this._onigBinding._freeOnigScanner(this._ptr);
 	}
 
-	public findNextMatchSync(string: string | OnigString, startPosition: number, options: FindOption[]): IOnigMatch | null;
-	public findNextMatchSync(string: string | OnigString, startPosition: number, debugCall: boolean): IOnigMatch | null;
-	public findNextMatchSync(string: string | OnigString, startPosition: number): IOnigMatch | null;
-	public findNextMatchSync(string: string | OnigString, startPosition: number, arg?: FindOption[] | boolean): IOnigMatch | null {
+	public findNextMatchSync(
+		string: string | OnigString,
+		startPosition: number,
+		options: FindOption[],
+	): IOnigMatch | null;
+	public findNextMatchSync(
+		string: string | OnigString,
+		startPosition: number,
+		debugCall: boolean,
+	): IOnigMatch | null;
+	public findNextMatchSync(
+		string: string | OnigString,
+		startPosition: number,
+	): IOnigMatch | null;
+	public findNextMatchSync(
+		string: string | OnigString,
+		startPosition: number,
+		arg?: FindOption[] | boolean,
+	): IOnigMatch | null {
 		let debugCall = defaultDebugCall;
 		let options = this._options;
 		if (Array.isArray(arg)) {
@@ -409,26 +460,55 @@ export class OnigScanner implements IOnigScanner {
 				debugCall = true;
 			}
 			options = options.concat(arg);
-		} else if (typeof arg === 'boolean') {
+		} else if (typeof arg === "boolean") {
 			debugCall = arg;
 		}
-		if (typeof string === 'string') {
+		if (typeof string === "string") {
 			string = new OnigString(string);
-			const result = this._findNextMatchSync(string, startPosition, debugCall, options);
+			const result = this._findNextMatchSync(
+				string,
+				startPosition,
+				debugCall,
+				options,
+			);
 			string.dispose();
 			return result;
 		}
-		return this._findNextMatchSync(string, startPosition, debugCall, options);
+		return this._findNextMatchSync(
+			string,
+			startPosition,
+			debugCall,
+			options,
+		);
 	}
 
-	private _findNextMatchSync(string: OnigString, startPosition: number, debugCall: boolean, options: FindOption[]): IOnigMatch | null {
+	private _findNextMatchSync(
+		string: OnigString,
+		startPosition: number,
+		debugCall: boolean,
+		options: FindOption[],
+	): IOnigMatch | null {
 		const onigBinding = this._onigBinding;
 		const opts = this.onigOptions(options);
 		let resultPtr: Pointer;
 		if (debugCall) {
-			resultPtr = onigBinding._findNextOnigScannerMatchDbg(this._ptr, string.id, string.ptr, string.utf8Length, string.convertUtf16OffsetToUtf8(startPosition), opts);
+			resultPtr = onigBinding._findNextOnigScannerMatchDbg(
+				this._ptr,
+				string.id,
+				string.ptr,
+				string.utf8Length,
+				string.convertUtf16OffsetToUtf8(startPosition),
+				opts,
+			);
 		} else {
-			resultPtr = onigBinding._findNextOnigScannerMatch(this._ptr, string.id, string.ptr, string.utf8Length, string.convertUtf16OffsetToUtf8(startPosition), opts);
+			resultPtr = onigBinding._findNextOnigScannerMatch(
+				this._ptr,
+				string.id,
+				string.ptr,
+				string.utf8Length,
+				string.convertUtf16OffsetToUtf8(startPosition),
+				opts,
+			);
 		}
 		if (resultPtr === 0) {
 			// no match
@@ -445,21 +525,23 @@ export class OnigScanner implements IOnigScanner {
 			captureIndices[i] = {
 				start: beg,
 				end: end,
-				length: end - beg
+				length: end - beg,
 			};
 		}
 		return {
 			index: index,
-			captureIndices: captureIndices
+			captureIndices: captureIndices,
 		};
 	}
 
 	private onigOptions(options: FindOption[]): number {
-		return options.map(o => this.onigOption(o)).reduce((acc, o) => acc | o, this._onigBinding.ONIG_OPTION_NONE);
+		return options
+			.map((o) => this.onigOption(o))
+			.reduce((acc, o) => acc | o, this._onigBinding.ONIG_OPTION_NONE);
 	}
 
 	private onigSyntax(syntax: Syntax): Pointer {
-		switch(syntax) {
+		switch (syntax) {
 			case Syntax.Default:
 				return this._onigBinding.ONIG_SYNTAX_DEFAULT;
 			case Syntax.Asis:
@@ -530,7 +612,8 @@ export class OnigScanner implements IOnigScanner {
 			case FindOption.PosixIsAscii:
 				return this._onigBinding.ONIG_OPTION_POSIX_IS_ASCII;
 			case FindOption.TextSegmentExtendedGraphemeCluster:
-				return this._onigBinding.ONIG_OPTION_TEXT_SEGMENT_EXTENDED_GRAPHEME_CLUSTER;
+				return this._onigBinding
+					.ONIG_OPTION_TEXT_SEGMENT_EXTENDED_GRAPHEME_CLUSTER;
 			case FindOption.TextSegmentWord:
 				return this._onigBinding.ONIG_OPTION_TEXT_SEGMENT_WORD;
 			case FindOption.NotBeginString:
@@ -548,7 +631,11 @@ export class OnigScanner implements IOnigScanner {
 }
 
 export interface WebAssemblyInstantiator {
-	(importObject: Record<string, Record<string, WebAssembly.ImportValue>> | undefined): Promise<WebAssembly.WebAssemblyInstantiatedSource>;
+	(
+		importObject:
+			| Record<string, Record<string, WebAssembly.ImportValue>>
+			| undefined,
+	): Promise<WebAssembly.WebAssemblyInstantiatedSource>;
 }
 interface ICommonOptions {
 	print?(str: string): void;
@@ -561,43 +648,64 @@ interface IDataOptions extends ICommonOptions {
 }
 export type IOptions = IInstantiatorOptions | IDataOptions;
 
-function _loadWASM(loader: WebAssemblyInstantiator, print: ((str: string) => void) | undefined, resolve: () => void, reject: (err: any) => void): void {
+function _loadWASM(
+	loader: WebAssemblyInstantiator,
+	print: ((str: string) => void) | undefined,
+	resolve: () => void,
+	reject: (err: any) => void,
+): void {
 	OnigasmModuleFactory({
 		print: print,
 		instantiateWasm: (importObject, callback) => {
-			if (typeof performance === 'undefined') {
+			if (typeof performance === "undefined") {
 				// performance.now() is not available in this environment, so use Date.now()
 				const get_now = () => Date.now();
 				(<any>importObject).env.emscripten_get_now = get_now;
-				(<any>importObject).wasi_snapshot_preview1.emscripten_get_now = get_now;
+				(<any>importObject).wasi_snapshot_preview1.emscripten_get_now =
+					get_now;
 			}
-			loader(importObject).then(instantiatedSource => callback(instantiatedSource.instance), reject);
+			loader(importObject).then(
+				(instantiatedSource) => callback(instantiatedSource.instance),
+				reject,
+			);
 			return {}; // indicate async instantiation
-		}
+		},
 	}).then((binding) => {
 		onigBinding = binding;
 		resolve();
 	});
 }
 
-function isInstantiatorOptionsObject(dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions): dataOrOptions is IInstantiatorOptions {
-	return (typeof (<IInstantiatorOptions>dataOrOptions).instantiator === 'function');
+function isInstantiatorOptionsObject(
+	dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions,
+): dataOrOptions is IInstantiatorOptions {
+	return (
+		typeof (<IInstantiatorOptions>dataOrOptions).instantiator === "function"
+	);
 }
 
-function isDataOptionsObject(dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions): dataOrOptions is IDataOptions {
-	return (typeof (<IDataOptions>dataOrOptions).data !== 'undefined');
+function isDataOptionsObject(
+	dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions,
+): dataOrOptions is IDataOptions {
+	return typeof (<IDataOptions>dataOrOptions).data !== "undefined";
 }
 
-function isResponse(dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions): dataOrOptions is Response {
-	return (typeof Response !== 'undefined' && dataOrOptions instanceof Response);
+function isResponse(
+	dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions,
+): dataOrOptions is Response {
+	return typeof Response !== "undefined" && dataOrOptions instanceof Response;
 }
 
 let initCalled = false;
 let initPromise: Promise<void> | null = null;
 
 export function loadWASM(options: IOptions): Promise<void>;
-export function loadWASM(data: ArrayBufferView | ArrayBuffer | Response): Promise<void>;
-export function loadWASM(dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions): Promise<void> {
+export function loadWASM(
+	data: ArrayBufferView | ArrayBuffer | Response,
+): Promise<void>;
+export function loadWASM(
+	dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions,
+): Promise<void> {
 	if (initCalled) {
 		// Already initialized
 		return initPromise!;
@@ -620,7 +728,7 @@ export function loadWASM(dataOrOptions: ArrayBufferView | ArrayBuffer | Response
 		}
 
 		if (isResponse(data)) {
-			if (typeof WebAssembly.instantiateStreaming === 'function') {
+			if (typeof WebAssembly.instantiateStreaming === "function") {
 				loader = _makeResponseStreamingLoader(data);
 			} else {
 				loader = _makeResponseNonStreamingLoader(data);
@@ -632,23 +740,31 @@ export function loadWASM(dataOrOptions: ArrayBufferView | ArrayBuffer | Response
 
 	let resolve: () => void;
 	let reject: (err: any) => void;
-	initPromise = new Promise<void>((_resolve, _reject) => { resolve = _resolve; reject = _reject; })
+	initPromise = new Promise<void>((_resolve, _reject) => {
+		resolve = _resolve;
+		reject = _reject;
+	});
 
 	_loadWASM(loader, print, resolve!, reject!);
 
 	return initPromise;
 }
 
-function _makeArrayBufferLoader(data: ArrayBufferView | ArrayBuffer): WebAssemblyInstantiator {
-	return importObject => WebAssembly.instantiate(data, importObject);
+function _makeArrayBufferLoader(
+	data: ArrayBufferView | ArrayBuffer,
+): WebAssemblyInstantiator {
+	return (importObject) => WebAssembly.instantiate(data, importObject);
 }
 function _makeResponseStreamingLoader(data: Response): WebAssemblyInstantiator {
-	return importObject => WebAssembly.instantiateStreaming(data, importObject);
+	return (importObject) =>
+		WebAssembly.instantiateStreaming(data, importObject);
 }
-function _makeResponseNonStreamingLoader(data: Response): WebAssemblyInstantiator {
-	return async importObject => {
+function _makeResponseNonStreamingLoader(
+	data: Response,
+): WebAssemblyInstantiator {
+	return async (importObject) => {
 		const arrayBuffer = await data.arrayBuffer();
-		return WebAssembly.instantiate(arrayBuffer, importObject)
+		return WebAssembly.instantiate(arrayBuffer, importObject);
 	};
 }
 
