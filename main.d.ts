@@ -30,6 +30,7 @@ export function setDefaultDebugCall(defaultDebugCall: boolean): void;
 
 export class OnigString {
 	readonly content: string;
+
 	constructor(content: string);
 	public dispose(): void;
 }
