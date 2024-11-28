@@ -21,11 +21,15 @@ interface IDataOptions extends ICommonOptions {
 export type IOptions = IInstantiatorOptions | IDataOptions;
 
 export function loadWASM(options: IOptions): Promise<void>;
+
 export function loadWASM(
 	data: ArrayBufferView | ArrayBuffer | Response,
 ): Promise<void>;
+
 export function createOnigString(str: string): OnigString;
+
 export function createOnigScanner(patterns: string[]): OnigScanner;
+
 export function setDefaultDebugCall(defaultDebugCall: boolean): void;
 
 export class OnigString {

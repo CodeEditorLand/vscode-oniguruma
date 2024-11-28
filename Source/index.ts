@@ -771,9 +771,11 @@ let initCalled = false;
 let initPromise: Promise<void> | null = null;
 
 export function loadWASM(options: IOptions): Promise<void>;
+
 export function loadWASM(
 	data: ArrayBufferView | ArrayBuffer | Response,
 ): Promise<void>;
+
 export function loadWASM(
 	dataOrOptions: ArrayBufferView | ArrayBuffer | Response | IOptions,
 ): Promise<void> {
