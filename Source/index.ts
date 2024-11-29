@@ -164,6 +164,7 @@ class UtfString {
 						codepoint =
 							(((charCode - 0xd800) << 10) + 0x10000) |
 							(nextCharCode - 0xdc00);
+
 						wasSurrogatePair = true;
 					}
 				}
@@ -188,10 +189,15 @@ class UtfString {
 	}
 
 	public readonly utf16Length: number;
+
 	public readonly utf8Length: number;
+
 	public readonly utf16Value: string;
+
 	public readonly utf8Value: Uint8Array;
+
 	public readonly utf16OffsetToUtf8: Uint32Array | null;
+
 	public readonly utf8OffsetToUtf16: Uint32Array | null;
 
 	constructor(str: string) {
@@ -208,6 +214,7 @@ class UtfString {
 		if (computeIndicesMapping) {
 			utf16OffsetToUtf8[utf16Length] = utf8Length;
 		}
+
 		const utf8OffsetToUtf16 = computeIndicesMapping
 			? new Uint32Array(utf8Length + 1)
 			: null!;
@@ -215,6 +222,7 @@ class UtfString {
 		if (computeIndicesMapping) {
 			utf8OffsetToUtf16[utf8Length] = utf16Length;
 		}
+
 		const utf8Value = new Uint8Array(utf8Length);
 
 		let i8 = 0;
@@ -236,6 +244,7 @@ class UtfString {
 						codePoint =
 							(((charCode - 0xd800) << 10) + 0x10000) |
 							(nextCharCode - 0xdc00);
+
 						wasSurrogatePair = true;
 					}
 				}
@@ -252,15 +261,21 @@ class UtfString {
 					utf8OffsetToUtf16[i8 + 0] = i16;
 				} else if (codePoint <= 0x7ff) {
 					utf8OffsetToUtf16[i8 + 0] = i16;
+
 					utf8OffsetToUtf16[i8 + 1] = i16;
 				} else if (codePoint <= 0xffff) {
 					utf8OffsetToUtf16[i8 + 0] = i16;
+
 					utf8OffsetToUtf16[i8 + 1] = i16;
+
 					utf8OffsetToUtf16[i8 + 2] = i16;
 				} else {
 					utf8OffsetToUtf16[i8 + 0] = i16;
+
 					utf8OffsetToUtf16[i8 + 1] = i16;
+
 					utf8OffsetToUtf16[i8 + 2] = i16;
+
 					utf8OffsetToUtf16[i8 + 3] = i16;
 				}
 			}
@@ -271,6 +286,7 @@ class UtfString {
 				utf8Value[i8++] =
 					0b11000000 |
 					((codePoint & 0b00000000000000000000011111000000) >>> 6);
+
 				utf8Value[i8++] =
 					0b10000000 |
 					((codePoint & 0b00000000000000000000000000111111) >>> 0);
@@ -278,9 +294,11 @@ class UtfString {
 				utf8Value[i8++] =
 					0b11100000 |
 					((codePoint & 0b00000000000000001111000000000000) >>> 12);
+
 				utf8Value[i8++] =
 					0b10000000 |
 					((codePoint & 0b00000000000000000000111111000000) >>> 6);
+
 				utf8Value[i8++] =
 					0b10000000 |
 					((codePoint & 0b00000000000000000000000000111111) >>> 0);
@@ -288,12 +306,15 @@ class UtfString {
 				utf8Value[i8++] =
 					0b11110000 |
 					((codePoint & 0b00000000000111000000000000000000) >>> 18);
+
 				utf8Value[i8++] =
 					0b10000000 |
 					((codePoint & 0b00000000000000111111000000000000) >>> 12);
+
 				utf8Value[i8++] =
 					0b10000000 |
 					((codePoint & 0b00000000000000000000111111000000) >>> 6);
+
 				utf8Value[i8++] =
 					0b10000000 |
 					((codePoint & 0b00000000000000000000000000111111) >>> 0);
@@ -305,15 +326,21 @@ class UtfString {
 		}
 
 		this.utf16Length = utf16Length;
+
 		this.utf8Length = utf8Length;
+
 		this.utf16Value = str;
+
 		this.utf8Value = utf8Value;
+
 		this.utf16OffsetToUtf8 = utf16OffsetToUtf8;
+
 		this.utf8OffsetToUtf16 = utf8OffsetToUtf16;
 	}
 
 	public createString(onigBinding: IOnigBinding): Pointer {
 		const result = onigBinding._omalloc(this.utf8Length);
+
 		onigBinding.HEAPU8.set(this.utf8Value, result);
 
 		return result;
@@ -322,37 +349,54 @@ class UtfString {
 
 export class OnigString implements IOnigString {
 	private static LAST_ID = 0;
+
 	private static _sharedPtr: Pointer = 0; // a pointer to a string of 10000 bytes
 	private static _sharedPtrInUse: boolean = false;
 
 	public readonly id = ++OnigString.LAST_ID;
+
 	private readonly _onigBinding: IOnigBinding;
+
 	public readonly content: string;
+
 	public readonly utf16Length: number;
+
 	public readonly utf8Length: number;
+
 	public readonly utf16OffsetToUtf8: Uint32Array | null;
+
 	public readonly utf8OffsetToUtf16: Uint32Array | null;
+
 	public readonly ptr: Pointer;
 
 	constructor(str: string) {
 		if (!onigBinding) {
 			throw new Error(`Must invoke loadWASM first.`);
 		}
+
 		this._onigBinding = onigBinding;
+
 		this.content = str;
 
 		const utfString = new UtfString(str);
+
 		this.utf16Length = utfString.utf16Length;
+
 		this.utf8Length = utfString.utf8Length;
+
 		this.utf16OffsetToUtf8 = utfString.utf16OffsetToUtf8;
+
 		this.utf8OffsetToUtf16 = utfString.utf8OffsetToUtf16;
 
 		if (this.utf8Length < 10000 && !OnigString._sharedPtrInUse) {
 			if (!OnigString._sharedPtr) {
 				OnigString._sharedPtr = onigBinding._omalloc(10000);
 			}
+
 			OnigString._sharedPtrInUse = true;
+
 			onigBinding.HEAPU8.set(utfString.utf8Value, OnigString._sharedPtr);
+
 			this.ptr = OnigString._sharedPtr;
 		} else {
 			this.ptr = utfString.createString(onigBinding);
@@ -364,11 +408,14 @@ export class OnigString implements IOnigString {
 			if (utf8Offset < 0) {
 				return 0;
 			}
+
 			if (utf8Offset > this.utf8Length) {
 				return this.utf16Length;
 			}
+
 			return this.utf8OffsetToUtf16[utf8Offset];
 		}
+
 		return utf8Offset;
 	}
 
@@ -377,11 +424,14 @@ export class OnigString implements IOnigString {
 			if (utf16Offset < 0) {
 				return 0;
 			}
+
 			if (utf16Offset > this.utf16Length) {
 				return this.utf8Length;
 			}
+
 			return this.utf16OffsetToUtf8[utf16Offset];
 		}
+
 		return utf16Offset;
 	}
 
@@ -396,34 +446,44 @@ export class OnigString implements IOnigString {
 
 export interface IOnigScannerConfig {
 	options?: FindOption[];
+
 	syntax?: Syntax;
 }
 
 export class OnigScanner implements IOnigScanner {
 	private readonly _onigBinding: IOnigBinding;
+
 	private readonly _ptr: Pointer;
+
 	private readonly _options: FindOption[];
 
 	constructor(patterns: string[], config?: IOnigScannerConfig) {
 		if (!onigBinding) {
 			throw new Error(`Must invoke loadWASM first.`);
 		}
+
 		const strPtrsArr: Pointer[] = [];
 
 		const strLenArr: number[] = [];
 
 		for (let i = 0, len = patterns.length; i < len; i++) {
 			const utfString = new UtfString(patterns[i]);
+
 			strPtrsArr[i] = utfString.createString(onigBinding);
+
 			strLenArr[i] = utfString.utf8Length;
 		}
+
 		const strPtrsPtr = onigBinding._omalloc(4 * patterns.length);
+
 		onigBinding.HEAPU32.set(strPtrsArr, strPtrsPtr / 4);
 
 		const strLenPtr = onigBinding._omalloc(4 * patterns.length);
+
 		onigBinding.HEAPU32.set(strLenArr, strLenPtr / 4);
 
 		this._onigBinding = onigBinding;
+
 		this._options = config?.options ?? [FindOption.CaptureGroup];
 
 		const opts = this.onigOptions(this._options);
@@ -437,12 +497,15 @@ export class OnigScanner implements IOnigScanner {
 			opts,
 			syntax,
 		);
+
 		this._ptr = scannerPtr;
 
 		for (let i = 0, len = patterns.length; i < len; i++) {
 			onigBinding._ofree(strPtrsArr[i]);
 		}
+
 		onigBinding._ofree(strLenPtr);
+
 		onigBinding._ofree(strPtrsPtr);
 
 		if (scannerPtr === 0) {
@@ -459,15 +522,18 @@ export class OnigScanner implements IOnigScanner {
 		startPosition: number,
 		options: FindOption[],
 	): IOnigMatch | null;
+
 	public findNextMatchSync(
 		string: string | OnigString,
 		startPosition: number,
 		debugCall: boolean,
 	): IOnigMatch | null;
+
 	public findNextMatchSync(
 		string: string | OnigString,
 		startPosition: number,
 	): IOnigMatch | null;
+
 	public findNextMatchSync(
 		string: string | OnigString,
 		startPosition: number,
@@ -481,10 +547,12 @@ export class OnigScanner implements IOnigScanner {
 			if (arg.includes(FindOption.DebugCall)) {
 				debugCall = true;
 			}
+
 			options = options.concat(arg);
 		} else if (typeof arg === "boolean") {
 			debugCall = arg;
 		}
+
 		if (typeof string === "string") {
 			string = new OnigString(string);
 
@@ -494,10 +562,12 @@ export class OnigScanner implements IOnigScanner {
 				debugCall,
 				options,
 			);
+
 			string.dispose();
 
 			return result;
 		}
+
 		return this._findNextMatchSync(
 			string,
 			startPosition,
@@ -537,10 +607,12 @@ export class OnigScanner implements IOnigScanner {
 				opts,
 			);
 		}
+
 		if (resultPtr === 0) {
 			// no match
 			return null;
 		}
+
 		const HEAPU32 = onigBinding.HEAPU32;
 
 		let offset = resultPtr / 4; // byte offset -> uint32 offset
@@ -554,12 +626,14 @@ export class OnigScanner implements IOnigScanner {
 			const beg = string.convertUtf8OffsetToUtf16(HEAPU32[offset++]);
 
 			const end = string.convertUtf8OffsetToUtf16(HEAPU32[offset++]);
+
 			captureIndices[i] = {
 				start: beg,
 				end: end,
 				length: end - beg,
 			};
 		}
+
 		return {
 			index: index,
 			captureIndices: captureIndices,
@@ -733,6 +807,7 @@ function _loadWASM(
 				(<any>importObject).wasi_snapshot_preview1.emscripten_get_now =
 					get_now;
 			}
+
 			loader(importObject).then(
 				(instantiatedSource) => callback(instantiatedSource.instance),
 				reject,
@@ -742,6 +817,7 @@ function _loadWASM(
 		},
 	}).then((binding) => {
 		onigBinding = binding;
+
 		resolve();
 	});
 }
@@ -783,6 +859,7 @@ export function loadWASM(
 		// Already initialized
 		return initPromise!;
 	}
+
 	initCalled = true;
 
 	let loader: WebAssemblyInstantiator;
@@ -791,12 +868,14 @@ export function loadWASM(
 
 	if (isInstantiatorOptionsObject(dataOrOptions)) {
 		loader = dataOrOptions.instantiator;
+
 		print = dataOrOptions.print;
 	} else {
 		let data: ArrayBufferView | ArrayBuffer | Response;
 
 		if (isDataOptionsObject(dataOrOptions)) {
 			data = dataOrOptions.data;
+
 			print = dataOrOptions.print;
 		} else {
 			data = dataOrOptions;
@@ -816,8 +895,10 @@ export function loadWASM(
 	let resolve: () => void;
 
 	let reject: (err: any) => void;
+
 	initPromise = new Promise<void>((_resolve, _reject) => {
 		resolve = _resolve;
+
 		reject = _reject;
 	});
 

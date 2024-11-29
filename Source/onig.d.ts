@@ -6,6 +6,7 @@ import * as types from "./types";
 
 declare function init(options: {
 	print?(str: string): void;
+
 	instantiateWasm(
 		importObject:
 			| Record<string, Record<string, WebAssembly.ImportValue>>

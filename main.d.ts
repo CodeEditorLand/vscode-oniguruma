@@ -36,6 +36,7 @@ export class OnigString {
 	readonly content: string;
 
 	constructor(content: string);
+
 	public dispose(): void;
 }
 
@@ -164,22 +165,27 @@ export const enum Syntax {
 
 export interface IOnigScannerConfig {
 	options?: FindOption[];
+
 	syntax?: Syntax;
 }
 
 export class OnigScanner {
 	constructor(patterns: string[], config?: IOnigScannerConfig);
+
 	public dispose(): void;
+
 	public findNextMatchSync(
 		string: string | OnigString,
 		startPosition: number,
 		options: FindOption[],
 	): IOnigMatch | null;
+
 	public findNextMatchSync(
 		string: string | OnigString,
 		startPosition: number,
 		debugCall: boolean,
 	): IOnigMatch | null;
+
 	public findNextMatchSync(
 		string: string | OnigString,
 		startPosition: number,
@@ -188,11 +194,14 @@ export class OnigScanner {
 
 export interface IOnigCaptureIndex {
 	start: number;
+
 	end: number;
+
 	length: number;
 }
 
 export interface IOnigMatch {
 	index: number;
+
 	captureIndices: IOnigCaptureIndex[];
 }
